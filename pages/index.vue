@@ -36,7 +36,7 @@
         type="number"
         min="0"
       ></v-text-field>
-      <p>年換算：{{ additionalMoneyPerYear == undefined ? '0' : additionalMoneyPerYear}} 円</p>
+      <p>年換算：{{ additionalMoneyPerYear == undefined ? '0' : additionalMoneyPerYear.toLocaleString()}} 円</p>
 
       <v-label>FIREプランの情報</v-label>
       <v-text-field
@@ -49,14 +49,29 @@
 
       <v-text-field
         v-model="useMoneyRate"
-        label="年切り崩し（または配当）率"
+        label="切り崩し（または配当）率/年"
         required
         type="number"
         min="0"
       ></v-text-field>
-      <p>FIRE達成目標金額：{{ targetCompleteFire == undefined ? '0' : targetCompleteFire}} 円</p>
+      <p>FIRE達成目標金額：{{ targetCompleteFire == undefined ? '0' : targetCompleteFire.toLocaleString()}} 円</p>
 
-
+      <v-label>試算オプション</v-label>
+      <v-text-field
+        v-model="calcYears"
+        label="試算年数"
+        required
+        type="number"
+        min="1"
+      ></v-text-field>
+      <v-checkbox
+        v-model="stopAdditionalMoney"
+        label="FIRE達成後に入金を止める"
+      ></v-checkbox>
+      <v-checkbox
+        v-model="startUseMoney"
+        label="FIRE達成後に切り崩し率で切り崩し始める"
+      ></v-checkbox>
       <v-btn
         color="error"
         class="mr-4"
@@ -72,7 +87,7 @@
         グラフ描画
       </v-btn>
     </v-form>
-    <BarChart ref="barChartRef" :calculationResult="calculationResult" :target="targetCompleteFire"/>
+    <BarChart ref="barChartRef" :calculationResult="calculationResult" :target="targetCompleteFire" :calcYears="calcYears"/>
   </div>
 </template>
 
@@ -81,6 +96,9 @@
   const barChartRef = ref();
 
   // data
+  let stopAdditionalMoney = ref<boolean>(false);
+  let startUseMoney = ref<boolean>(false);
+  let calcYears = ref<number>(1);
   let totalMoney = ref<number>(0);
   let defanseMoney = ref<number>(0);
   let costOfLiving = ref<number>(0);
@@ -92,14 +110,33 @@
   // main logic
   let calculationResult = ref();
   calculationResult = computed(() => {
+    let completeFlag = false
     let result = [0];
-      result[0] = totalMoney.value; // 0年目
-      let nextVal = totalMoney.value - defanseMoney.value; // 0年目      
-      for (let i=1; i<50; i++) {
-        // 次年度額 = (総資産額-生活防衛資金) *(1+利率) + 追加投資額
-        nextVal = nextVal * ((100 + investmentInterestRate.value) / 100) + additionalMoneyPerYear.value
+    result[0] = totalMoney.value; // 0年目
+    let nextVal = totalMoney.value - defanseMoney.value; // 0年目      
+    for (let i=1; i<calcYears.value; i++) {
+      if (completeFlag && (stopAdditionalMoney || startUseMoney)) {
+        // 次年度額 = (総資産額-生活防衛資金) *(1+利率)
+        nextVal = nextVal * ((100 + investmentInterestRate.value) / 100)
+        if (startUseMoney) {
+          // -= 年切り崩し額
+          nextVal -= (nextVal*(useMoneyRate.value/100))
+        }
+        if (!stopAdditionalMoney) {
+          // += 追加投資額
+          nextVal += additionalMoneyPerYear.value
+        }
         result.push(parseInt((defanseMoney.value + nextVal).toFixed()))
       }
+      else {
+        // 次年度額 = (総資産額-生活防衛資金) *(1+利率) + 追加投資額
+        nextVal = nextVal * ((100 + investmentInterestRate.value) / 100) + additionalMoneyPerYear.value
+        result.push(parseInt((defanseMoney.value + nextVal).toFixed().toLocaleString()))
+      }
+      if (nextVal > targetCompleteFire.value) {
+        completeFlag = true;
+      }
+    }
     return result;
   })
   let targetCompleteFire = computed(() => {
