@@ -1,0 +1,24 @@
+<template>
+    <div>
+        <v-list
+            dense
+        >
+            <p>入力項目</p>
+            <v-list-item>総資産額</v-list-item>
+            <v-list-item>生活防衛資金</v-list-item>
+            <v-list-item>基準年間生活費</v-list-item>
+            <v-list-item>投資利率/年</v-list-item>
+            <v-list-item>追加入金/月と×12の結果</v-list-item>
+        </v-list>
+        <v-list
+            dense
+        >
+            <p>機能</p>
+            <v-list-item>資産増加ペースグラフ</v-list-item>
+            <v-list-item>FIRE時期表示（投資利率と生活費から釣り合うタイミングを計算）</v-list-item>
+            <v-list-item>生活費計算（食費とかから計算する）</v-list-item>
+            <v-list-item>Twitter投稿（いい感じのOGP画像で吐き出す）</v-list-item>
+            <v-list-item>家計改善示唆（平均データとの差分を提示）</v-list-item>
+        </v-list>
+    </div>
+</template>
