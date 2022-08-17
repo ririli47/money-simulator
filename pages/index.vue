@@ -75,7 +75,7 @@
       <v-btn
         color="error"
         class="mr-4"
-        @click="reset"
+        @click="reset()"
       >
         Reset Form
       </v-btn>
@@ -91,21 +91,21 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
   import BarChart from '@/components/BarChart.vue'
   const barChartRef = ref();
 
   // data
-  let stopAdditionalMoney = ref<boolean>(false);
-  let startUseMoney = ref<boolean>(false);
-  let calcYears = ref<number>(1);
-  let totalMoney = ref<number>(0);
-  let defanseMoney = ref<number>(0);
-  let costOfLiving = ref<number>(0);
-  let useMoneyRate = ref<number>(0);
-  let investmentInterestRate = ref<number>(0);
-  let additionalMoney = ref<number>(0);
-  const additionalMoneyPerYear = computed<number>(() => additionalMoney.value * 12)
+  let stopAdditionalMoney = ref(false);
+  let startUseMoney = ref(false);
+  let calcYears = ref(1);
+  let totalMoney = ref(0);
+  let defanseMoney = ref(0);
+  let costOfLiving = ref(0);
+  let useMoneyRate = ref(0);
+  let investmentInterestRate = ref(0);
+  let additionalMoney = ref(0);
+  const additionalMoneyPerYear = computed(() => additionalMoney.value * 12)
 
   // main logic
   let calculationResult = ref();
