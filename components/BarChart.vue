@@ -6,8 +6,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
-// import { Chart } from 'chart.js'
-// import chartjsPluginAnnotation from 'chartjs-plugin-annotation'
+import { Chart } from 'chart.js'
+import chartjsPluginAnnotation from 'chartjs-plugin-annotation'
 
 export default defineComponent({
   props: ['calculationResult', 'target', 'calcYears'],
